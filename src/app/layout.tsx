@@ -14,9 +14,9 @@ export const metadata: Metadata = {
   title: "GranaBank",
   description: "Plataforma de banca digital",
   icons: {
-    icon: "/GranaBank_Logo.png",
-    shortcut: "/GranaBank_Logo.png",
-    apple: "/GranaBank_Logo.png",
+    icon: "/GranaBank_Logo.webp",
+    shortcut: "/GranaBank_Logo.webp",
+    apple: "/GranaBank_Logo.webp",
   },
 };
 

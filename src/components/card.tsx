@@ -58,7 +58,7 @@ export const Card: React.FC<CardProps> = ({
         <div className="flex items-center justify-center">
           {brand === "mastercard" ? (
             <Image
-              src="/mastercard.png"
+              src="/mastercard.webp"
               alt="Mastercard"
               width={38}
               height={24}
@@ -66,7 +66,7 @@ export const Card: React.FC<CardProps> = ({
             />
           ) : brand === "visa" ? (
             <Image
-              src="/visa.png"
+              src="/visa.webp"
               alt="Visa"
               width={40}
               height={16}

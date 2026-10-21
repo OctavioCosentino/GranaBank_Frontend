@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useMemo, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { AlertCircle } from "lucide-react";
 import { SearchBar } from "@/components/search-bar";
 import { FilterBar, type FilterOption } from "@/components/filter-bar";
 import {
@@ -50,9 +49,6 @@ function TransactionsContent() {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
-    isError,
-    error,
-    refetch,
   } = useInfiniteTransactionsQuery({
     search: debouncedSearch,
     type: selectedFilter,
@@ -131,25 +127,6 @@ function TransactionsContent() {
                 <TransactionSkeleton />
                 <TransactionSkeleton />
               </>
-            ) : isError ? (
-              <div className="flex flex-col items-center justify-center p-6 text-center my-auto">
-                <div className="w-14 h-14 rounded-full bg-[#E4D2D5]/50 flex items-center justify-center text-[#7A1D2D] mb-3">
-                  <AlertCircle className="w-7 h-7 stroke-[2]" />
-                </div>
-                <span className="text-[16px] font-semibold text-[#1A202C]">
-                  No se pudieron cargar los movimientos
-                </span>
-                <p className="text-[13px] text-[#718096] max-w-[260px] mt-1 mb-4">
-                  {error?.message || "Ocurrió un error en el servidor al consultar las transacciones."}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => refetch()}
-                  className="h-10 px-5 rounded-[14px] bg-[#7A1D2D] text-white text-[14px] font-medium hover:bg-[#661624] active:scale-95 transition-all cursor-pointer shadow-xs"
-                >
-                  Reintentar
-                </button>
-              </div>
             ) : transactions.length === 0 ? (
               <EmptyState
                 type={isFiltered ? "no-results" : "no-transactions"}
