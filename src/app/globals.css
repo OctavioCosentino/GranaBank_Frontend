@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+:root {
+  --background: #F9FAFC;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-poppins), sans-serif;
+}
+
+body {
+  background-color: #F9FAFC;
+  color: var(--foreground);
+  font-family: var(--font-poppins), sans-serif;
+}
+
+/* Toast de notificaciones con fondo #E4D2D5 y borde fino negro */
+[data-sonner-toaster] {
+  --normal-bg: #E4D2D5 !important;
+  --normal-border: #000000 !important;
+  --normal-text: #1A202C !important;
+}
+
+[data-sonner-toast],
+[data-sonner-toast][data-styled="true"],
+li[data-sonner-toast] {
+  background: #E4D2D5 !important;
+  background-color: #E4D2D5 !important;
+  border: 1px solid #000000 !important;
+  color: #1A202C !important;
+  font-family: var(--font-poppins), sans-serif !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-sonner-toast] [data-close-button] {
+  background: #E4D2D5 !important;
+  background-color: #E4D2D5 !important;
+  border: 1px solid #000000 !important;
+  color: #000000 !important;
+  cursor: pointer !important;
+}
+
+[data-sonner-toast] [data-title] {
+  color: #1A202C !important;
+  font-weight: 600 !important;
+}
+
+[data-sonner-toast] [data-description] {
+  color: #4A5568 !important;
+}
