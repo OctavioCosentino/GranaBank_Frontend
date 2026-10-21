@@ -1,4 +1,5 @@
 import { env } from "@/lib/env";
+import { tokenManager } from "@/lib/token-manager";
 import { createClient } from "@/lib/supabase/client";
 import type { ApiError, ApiResponse } from "@/types/api";
 
@@ -15,6 +16,11 @@ export class ApiClient {
   }
 
   private async getAuthToken(): Promise<string | null> {
+    // Prioriza el token gestionado del backend externo
+    const localToken = tokenManager.getAccessToken();
+    if (localToken) return localToken;
+
+    // Respaldo de sesión en caso de integración directa
     try {
       const supabase = createClient();
       const { data } = await supabase.auth.getSession();
@@ -62,13 +68,45 @@ export class ApiClient {
 
       const responseBody = await res.json().catch(() => null);
 
-      if (!res.ok) {
+      if (!res.ok || responseBody?.success === false) {
+        let errorMessage = `HTTP error: ${res.status}`;
+
+        if (typeof responseBody?.message === "string") {
+          errorMessage = responseBody.message;
+        } else if (Array.isArray(responseBody?.message)) {
+          errorMessage = responseBody.message
+            .map((item: unknown) =>
+              typeof item === "string" ? item : JSON.stringify(item)
+            )
+            .join(", ");
+        } else if (
+          responseBody?.message &&
+          typeof responseBody.message === "object"
+        ) {
+          const innerMsg = (
+            responseBody.message as Record<string, unknown>
+          ).message;
+          errorMessage =
+            typeof innerMsg === "string"
+              ? innerMsg
+              : JSON.stringify(responseBody.message);
+        } else if (typeof responseBody?.error === "string") {
+          errorMessage = responseBody.error;
+        } else if (
+          responseBody?.error &&
+          typeof responseBody.error === "object"
+        ) {
+          const innerErr = (responseBody.error as Record<string, unknown>)
+            .message;
+          errorMessage =
+            typeof innerErr === "string"
+              ? innerErr
+              : JSON.stringify(responseBody.error);
+        }
+
         const error: ApiError = {
-          statusCode: res.status,
-          message:
-            responseBody?.message ||
-            responseBody?.error ||
-            `HTTP error: ${res.status}`,
+          statusCode: responseBody?.statusCode || res.status,
+          message: errorMessage,
           details: responseBody,
         };
         throw error;
@@ -76,13 +114,34 @@ export class ApiClient {
 
       return responseBody as ApiResponse<T>;
     } catch (err: unknown) {
-      if ((err as ApiError).statusCode) {
+      if (
+        (err as ApiError)?.statusCode &&
+        typeof (err as ApiError)?.message === "string"
+      ) {
         throw err;
       }
 
+      let fallbackMessage = "Error inesperado de red";
+      if (err instanceof Error && typeof err.message === "string") {
+        fallbackMessage = err.message;
+      } else if (typeof err === "string") {
+        fallbackMessage = err;
+      } else if (err && typeof err === "object") {
+        const anyErr = err as Record<string, unknown>;
+        if (typeof anyErr.message === "string") {
+          fallbackMessage = anyErr.message;
+        } else if (anyErr.message && typeof anyErr.message === "object") {
+          const inner = anyErr.message as Record<string, unknown>;
+          fallbackMessage =
+            typeof inner.message === "string"
+              ? inner.message
+              : JSON.stringify(anyErr.message);
+        }
+      }
+
       throw {
-        statusCode: 500,
-        message: (err as Error).message || "Error inesperado de red",
+        statusCode: (err as ApiError)?.statusCode || 500,
+        message: fallbackMessage,
       } satisfies ApiError;
     }
   }

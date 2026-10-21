@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { tokenManager } from "@/lib/token-manager";
 import { LogoutModal } from "@/components/logout-modal";
 
 // Barra inferior de opciones para la navegación privada
@@ -18,9 +19,10 @@ export const BottomBar: React.FC = () => {
     { id: "transactions", href: "/transactions" },
   ];
 
-  // Confirma el cierre de sesión, dispara el toast y redirige al login
+  // Confirma el cierre de sesión, elimina tokens, dispara el toast y redirige al login
   const handleConfirmLogout = () => {
     setIsLogoutOpen(false);
+    tokenManager.clearSession();
     toast("Sesión cerrada correctamente", {
       description: "Esperamos verte pronto nuevamente.",
       duration: 4000,

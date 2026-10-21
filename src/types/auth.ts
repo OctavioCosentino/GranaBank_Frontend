@@ -20,3 +20,40 @@ export interface AuthState {
   isLoading: boolean;
   isAuthenticated: boolean;
 }
+
+// Credenciales para inicio de sesión en el backend externo
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface BackendUser {
+  id: string;
+  email: string;
+}
+
+export interface BackendSession {
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+  token_type: string;
+}
+
+export interface BackendProfile {
+  id: string;
+  name: string;
+}
+
+export interface LoginResponseData {
+  user: BackendUser;
+  session: BackendSession;
+  profile: BackendProfile;
+}
+
+export interface StoredSession {
+  user: BackendUser;
+  session: BackendSession;
+  profile: BackendProfile;
+  rememberMe: boolean;
+  expiresAt: number;
+}

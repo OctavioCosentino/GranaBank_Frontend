@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { HomeHeader } from "@/components/home-header";
 import { CardCarousel, type CardData } from "@/components/card-carousel";
 import { TransactionCard, type TransactionType } from "@/components/transaction";
 import { AddCardModal } from "@/components/add-card-modal";
+import { tokenManager } from "@/lib/token-manager";
 
 interface TransactionItem {
   type: TransactionType;
@@ -77,9 +78,20 @@ const sampleTransactions: TransactionItem[] = [
 
 // Página principal del usuario (primera pestaña: /home)
 export default function HomePage() {
-  const userName = "Granate";
+  const [userName, setUserName] = useState("Granate");
   const [cards, setCards] = useState<CardData[]>(initialCards);
   const [isAddCardOpen, setIsAddCardOpen] = useState(false);
+
+  useEffect(() => {
+    const profile = tokenManager.getProfile();
+    if (profile?.name) {
+      const firstName = profile.name.split(" ")[0];
+      const timer = setTimeout(() => {
+        setUserName(firstName);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   // Máximo 6 movimientos
   const displayTransactions = sampleTransactions.slice(0, 6);

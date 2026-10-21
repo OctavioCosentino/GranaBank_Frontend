@@ -8,6 +8,7 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
   placeholder?: string;
   type?: "text" | "email" | "password" | "number" | "tel";
   containerClassName?: string;
+  error?: boolean;
 }
 
 // Componente de input con soporte para título, placeholder y toggle de visibilidad para passwords
@@ -20,6 +21,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       className = "",
       containerClassName = "",
       disabled,
+      error = false,
       ...rest
     },
     ref
@@ -29,6 +31,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     // Determina el tipo real del input según el estado del toggle
     const currentType = isPassword ? (showPassword ? "text" : "password") : type;
+
+    // Estilos dinámicos de borde según estado de error
+    const borderStyles = error
+      ? "border-[#E53E3E] focus:border-[#E53E3E] focus:ring-1 focus:ring-[#E53E3E]"
+      : "border-[#E2E8F0] focus:border-[#7A1D2D] focus:ring-1 focus:ring-[#7A1D2D]";
 
     return (
       <div className={`flex flex-col gap-1.5 w-full ${containerClassName}`}>
@@ -44,7 +51,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             type={currentType}
             placeholder={placeholder}
             disabled={disabled}
-            className={`w-full h-12 px-4 rounded-xl border border-[#E2E8F0] bg-white text-[15px] text-[#2D3748] placeholder-[#A0AEC0] outline-none transition-all focus:border-[#7A1D2D] focus:ring-1 focus:ring-[#7A1D2D] disabled:bg-[#EDF2F7] disabled:cursor-not-allowed ${
+            className={`w-full h-12 px-4 rounded-xl border bg-white text-[15px] text-[#2D3748] placeholder-[#A0AEC0] outline-none focus:outline-none transition-all disabled:bg-[#EDF2F7] disabled:cursor-not-allowed ${borderStyles} ${
               isPassword ? "pr-12" : ""
             } ${className}`}
             {...rest}

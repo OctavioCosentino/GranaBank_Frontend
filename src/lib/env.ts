@@ -5,7 +5,7 @@ export const env = {
     anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
   },
   api: {
-    baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
+    baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1",
   },
   app: {
     url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
