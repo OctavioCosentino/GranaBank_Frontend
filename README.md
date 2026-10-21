@@ -85,10 +85,10 @@ La aplicación implementa un esquema de **doble capa de seguridad** utilizando l
 1. **Protección Perimetral en el Servidor ([`src/middleware.ts`](src/middleware.ts))**:
    - Corre en el Edge antes de que la página comience a renderizarse.
    - Detecta accesos a `/home` o `/transactions` sin credenciales válidas y los redirige inmediatamente al login (`/`).
-   - Permite redirigir automáticamente del login a `/home` **únicamente si el usuario configuró una sesión persistente** (`granabank_remember=true`), evitando bloqueos si la sesión es temporal.
+   - Redirige automáticamente del login (`/`) a `/home` a nivel de servidor si el usuario cuenta con una sesión persistente (`granabank_remember=true`). Para sesiones temporales, la redirección la coordina el cliente mediante `useSyncExternalStore` por pestaña, eliminando cualquier bucle o retraso entre servidor y cliente.
 2. **Validación en Cliente ([`PrivateLayout`](<src/app/(private)/layout.tsx>))**:
-   - Verifica en tiempo real la presencia del token en el almacenamiento correspondiente (`localStorage` o `sessionStorage`).
-   - Si no hay token activo, purga cualquier rastro residual de cookies y redirige al login sin destellos de contenido desautenticado.
+   - Resuelve el estado de autenticación de forma reactiva y sincrónica con `useSyncExternalStore` conectado a [`tokenManager.getAccessToken()`](src/lib/token-manager.ts).
+   - Si no hay token activo, purga cualquier rastro residual de cookies y redirige al login de inmediato sin bloqueos ni loaders infinitos.
 
 > **Nota**: Las rutas no existentes son interceptadas por una página 404 personalizada ([`src/app/not-found.tsx`](src/app/not-found.tsx)), que redirige al usuario al inicio según su estado de sesión.
 
@@ -206,12 +206,23 @@ pnpm install
 
 2. Configurar las variables de entorno creando el archivo `.env.local`:
 
-Configurar las variables según el entorno:
-
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
+# Backend externo (API desplegada en Render)
+NEXT_PUBLIC_API_URL=https://granabank-backend.onrender.com/api/v1
+
+# URL pública del frontend (En producción: URL de Vercel)
+NEXT_PUBLIC_SITE_URL=https://tu-proyecto.vercel.app
 ```
+
+> [!NOTE]
+> **Pruebas y desarrollo local (`localhost`)**:
+> Si vas a ejecutar la aplicación localmente en tu máquina, ajusta en tu `.env.local`:
+>
+> ```env
+> NEXT_PUBLIC_SITE_URL=http://localhost:3000
+> ```
+>
+> La API del backend (`NEXT_PUBLIC_API_URL`) puede seguir apuntando a Render (`https://granabank-backend.onrender.com/api/v1`) para contar con datos reales, o a un backend local (por ejemplo `http://localhost:5000/api/v1`) si estás desarrollando en local.
 
 3. Iniciar el servidor de desarrollo:
 

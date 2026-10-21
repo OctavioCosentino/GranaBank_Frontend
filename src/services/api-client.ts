@@ -1,6 +1,5 @@
 import { env } from "@/lib/env";
 import { tokenManager } from "@/lib/token-manager";
-import { createClient } from "@/lib/supabase/client";
 import type { ApiError, ApiResponse } from "@/types/api";
 
 interface RequestOptions extends RequestInit {
@@ -15,19 +14,8 @@ export class ApiClient {
     this.baseUrl = baseUrl.replace(/\/$/, "");
   }
 
-  private async getAuthToken(): Promise<string | null> {
-    // Prioriza el token gestionado del backend externo
-    const localToken = tokenManager.getAccessToken();
-    if (localToken) return localToken;
-
-    // Respaldo de sesión en caso de integración directa
-    try {
-      const supabase = createClient();
-      const { data } = await supabase.auth.getSession();
-      return data.session?.access_token || null;
-    } catch {
-      return null;
-    }
+  private getAuthToken(): string | null {
+    return tokenManager.getAccessToken();
   }
 
   private buildUrl(

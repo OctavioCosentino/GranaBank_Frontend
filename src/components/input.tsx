@@ -60,9 +60,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           {isPassword && (
             <button
               type="button"
-              onClick={() => setShowPassword((prev) => !prev)}
+              onMouseDown={(e) => {
+                // Evita que el input pierda el foco al hacer clic en el ojo
+                e.preventDefault();
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowPassword((prev) => !prev);
+              }}
               tabIndex={-1}
-              className="absolute right-4 text-[#A0AEC0] hover:text-[#7A1D2D] transition-colors focus:outline-none cursor-pointer"
+              className="absolute right-0 top-0 bottom-0 px-3.5 flex items-center justify-center text-[#A0AEC0] hover:text-[#7A1D2D] transition-colors focus:outline-none cursor-pointer z-10"
               aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
             >
               {showPassword ? (

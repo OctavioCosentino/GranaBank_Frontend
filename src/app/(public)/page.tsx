@@ -1,11 +1,28 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useSyncExternalStore } from "react";
 import { GranaBanner } from "@/components/grana-banner";
 import { Input } from "@/components/input";
 import { Checkbox } from "@/components/checkbox";
 import { GranaButton } from "@/components/grana-button";
 import { useLoginMutation } from "@/hooks/use-login-mutation";
+import { tokenManager } from "@/lib/token-manager";
+
+function subscribe(callback: () => void) {
+  if (typeof window !== "undefined") {
+    window.addEventListener("storage", callback);
+    return () => window.removeEventListener("storage", callback);
+  }
+  return () => {};
+}
+
+function getSnapshot(): string | null {
+  return tokenManager.getAccessToken();
+}
+
+function getServerSnapshot(): string | null {
+  return null;
+}
 
 // Página pública de inicio de sesión conectada al backend mediante TanStack Query
 export default function LoginPage() {
@@ -14,7 +31,23 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [hasCredentialsError, setHasCredentialsError] = useState(false);
 
+  const token = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const loginMutation = useLoginMutation();
+
+  // Si ya existe sesión activa en esta pestaña, redirige inmediatamente a /home
+  useEffect(() => {
+    if (token) {
+      window.location.replace("/home");
+    }
+  }, [token]);
+
+  if (token) {
+    return (
+      <main className="min-h-[100dvh] flex items-center justify-center bg-[#F9FAFC]">
+        <div className="w-8 h-8 border-3 border-[#7A1D2D] border-t-transparent rounded-full animate-spin" />
+      </main>
+    );
+  }
 
   // Limpia el borde rojo en ambos inputs al empezar a editar o borrar
   const handleClearError = () => {

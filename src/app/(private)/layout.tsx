@@ -1,8 +1,24 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useSyncExternalStore } from "react";
 import { BottomBar } from "@/components/bottom-bar";
 import { tokenManager } from "@/lib/token-manager";
+
+function subscribe(callback: () => void) {
+  if (typeof window !== "undefined") {
+    window.addEventListener("storage", callback);
+    return () => window.removeEventListener("storage", callback);
+  }
+  return () => {};
+}
+
+function getSnapshot(): string | null {
+  return tokenManager.getAccessToken();
+}
+
+function getServerSnapshot(): string | null {
+  return null;
+}
 
 // Layout para páginas privadas con validación de autenticación y barra inferior
 export default function PrivateLayout({
@@ -10,23 +26,17 @@ export default function PrivateLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const token = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   useEffect(() => {
-    const token = tokenManager.getAccessToken();
-    if (!token) {
+    if (!tokenManager.getAccessToken()) {
       tokenManager.clearSession();
       window.location.replace("/");
-    } else {
-      const timer = setTimeout(() => {
-        setIsAuthenticated(true);
-      }, 0);
-      return () => clearTimeout(timer);
     }
   }, []);
 
   // Evita mostrar vistas privadas si no está autenticado
-  if (isAuthenticated === null) {
+  if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F9FAFC]">
         <div className="w-8 h-8 border-3 border-[#7A1D2D] border-t-transparent rounded-full animate-spin" />

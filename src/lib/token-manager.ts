@@ -56,10 +56,8 @@ class TokenManager {
       this.setCookie(COOKIE_NAME, session.access_token, THIRTY_DAYS_SECONDS);
       this.setCookie("granabank_remember", "true", THIRTY_DAYS_SECONDS);
     } else {
-      // Recordarme inactivo: almacenamiento únicamente en la sesión del navegador
-      localStorage.removeItem(ACCESS_TOKEN_KEY);
-      localStorage.removeItem(REFRESH_TOKEN_KEY);
-      localStorage.removeItem(SESSION_DATA_KEY);
+      // Recordarme inactivo: almacenamiento únicamente en la sesión temporal del navegador
+      this.clearLocalStorage();
 
       sessionStorage.setItem(ACCESS_TOKEN_KEY, session.access_token);
       sessionStorage.setItem(REFRESH_TOKEN_KEY, session.refresh_token);
@@ -72,46 +70,81 @@ class TokenManager {
 
   // Obtiene el token de acceso activo
   getAccessToken(): string | null {
-    if (this.inMemoryToken) return this.inMemoryToken;
     if (typeof window === "undefined") return null;
 
+    // 1. Pestaña activa: sessionStorage siempre tiene prioridad
     const sessionToken = sessionStorage.getItem(ACCESS_TOKEN_KEY);
     if (sessionToken) {
       this.inMemoryToken = sessionToken;
       return sessionToken;
     }
 
-    const localToken = localStorage.getItem(ACCESS_TOKEN_KEY);
-    if (localToken) {
-      this.inMemoryToken = localToken;
-      return localToken;
+    // 2. Persistencia en localStorage SOLO si el usuario seleccionó Recordarme
+    const session = this.getSession();
+    if (session && session.rememberMe === true) {
+      const localToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+      if (localToken) {
+        this.inMemoryToken = localToken;
+        return localToken;
+      }
     }
 
+    // Si no marcó Recordarme o la sesión se cerró, no existe token válido
+    this.inMemoryToken = null;
     return null;
   }
 
   // Obtiene el refresh token activo
   getRefreshToken(): string | null {
     if (typeof window === "undefined") return null;
-    return (
-      sessionStorage.getItem(REFRESH_TOKEN_KEY) ||
-      localStorage.getItem(REFRESH_TOKEN_KEY)
-    );
+
+    const sessionToken = sessionStorage.getItem(REFRESH_TOKEN_KEY);
+    if (sessionToken) return sessionToken;
+
+    const session = this.getSession();
+    if (session && session.rememberMe === true) {
+      return localStorage.getItem(REFRESH_TOKEN_KEY);
+    }
+
+    return null;
   }
 
-  // Obtiene la sesión completa almacenada
+  // Obtiene la sesión completa almacenada verificando Recordarme y expiración
   getSession(): StoredSession | null {
     if (typeof window === "undefined") return null;
 
-    const raw =
-      sessionStorage.getItem(SESSION_DATA_KEY) ||
-      localStorage.getItem(SESSION_DATA_KEY);
+    // 1. Busca en sessionStorage de la pestaña activa
+    const sessionRaw = sessionStorage.getItem(SESSION_DATA_KEY);
+    if (sessionRaw) {
+      try {
+        return JSON.parse(sessionRaw) as StoredSession;
+      } catch {
+        sessionStorage.removeItem(SESSION_DATA_KEY);
+      }
+    }
 
-    if (!raw) return null;
+    // 2. Si no está en sessionStorage, solo recupera de localStorage si el usuario marcó Recordarme
+    const localRaw = localStorage.getItem(SESSION_DATA_KEY);
+    if (!localRaw) {
+      this.clearLocalStorage();
+      return null;
+    }
 
     try {
-      return JSON.parse(raw) as StoredSession;
+      const parsed = JSON.parse(localRaw) as StoredSession;
+      if (parsed.rememberMe === true) {
+        if (parsed.expiresAt && Date.now() > parsed.expiresAt) {
+          this.clearSession();
+          return null;
+        }
+        return parsed;
+      }
+
+      // Si no tenía rememberMe habilitado, no debe persistir en localStorage
+      this.clearLocalStorage();
+      return null;
     } catch {
+      this.clearLocalStorage();
       return null;
     }
   }
@@ -131,9 +164,7 @@ class TokenManager {
     this.inMemoryToken = null;
     if (typeof window === "undefined") return;
 
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-    localStorage.removeItem(SESSION_DATA_KEY);
+    this.clearLocalStorage();
 
     sessionStorage.removeItem(ACCESS_TOKEN_KEY);
     sessionStorage.removeItem(REFRESH_TOKEN_KEY);
@@ -141,6 +172,13 @@ class TokenManager {
 
     this.deleteCookie(COOKIE_NAME);
     this.deleteCookie("granabank_remember");
+  }
+
+  private clearLocalStorage(): void {
+    if (typeof window === "undefined") return;
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+    localStorage.removeItem(SESSION_DATA_KEY);
   }
 
   private setCookie(name: string, value: string, maxAgeSeconds?: number): void {
