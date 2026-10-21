@@ -1,26 +1,26 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
+import { CreditCard } from "lucide-react";
 import { toast } from "sonner";
-import type { CardData } from "@/components/card-carousel";
+import { useCreateCardMutation } from "@/hooks/use-cards";
 
 interface AddCardModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddCard: (card: CardData) => void;
 }
 
 // Modal para ingresar y validar los datos de una nueva tarjeta bancaria
 export const AddCardModal: React.FC<AddCardModalProps> = ({
   isOpen,
   onClose,
-  onAddCard,
 }) => {
   const [cardholderName, setCardholderName] = useState("");
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [isTouchedExpiry, setIsTouchedExpiry] = useState(false);
+
+  const createCardMutation = useCreateCardMutation();
 
   // Cierra el modal y restablece los campos
   const handleClose = useCallback(() => {
@@ -62,9 +62,9 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
     setCardNumber(formatted);
   };
 
-  // Solo números, auto-barra con formato MM/YEAR
+  // Solo números, auto-barra con formato MM/YY
   const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let raw = e.target.value.replace(/\D/g, "").slice(0, 6);
+    let raw = e.target.value.replace(/\D/g, "").slice(0, 4);
 
     if (raw.length === 1 && parseInt(raw, 10) > 1) {
       raw = `0${raw}`;
@@ -89,14 +89,11 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
     }
   };
 
-  // Detección de franquicia (Visa o Mastercard)
   const cleanNumber = cardNumber.replace(/\s/g, "");
-  const brand: "visa" | "mastercard" = cleanNumber.startsWith("4")
-    ? "visa"
-    : "mastercard";
 
-  // Validación de fecha contra el año actual del sistema
-  const currentYear = new Date().getFullYear();
+  // Validación de fecha contra el año actual del sistema (formato YY)
+  const currentFullYear = new Date().getFullYear();
+  const currentYY = currentFullYear % 100;
   const currentMonth = new Date().getMonth() + 1;
   const parts = expiryDate.split("/");
   const monthStr = parts[0] || "";
@@ -104,45 +101,58 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
 
   // Año vencido o menor al año actual
   const hasYearError =
-    (yearStr.length === 4 &&
-      (parseInt(yearStr, 10) < currentYear ||
-        (parseInt(yearStr, 10) === currentYear &&
+    (yearStr.length === 2 &&
+      (parseInt(yearStr, 10) < currentYY ||
+        (parseInt(yearStr, 10) === currentYY &&
           parseInt(monthStr, 10) < currentMonth))) ||
-    (isTouchedExpiry && yearStr.length > 0 && yearStr.length < 4);
+    (isTouchedExpiry && yearStr.length > 0 && yearStr.length < 2);
 
   // Validez global del formulario
   const isFormValid =
     cardholderName.trim().length >= 3 &&
     cleanNumber.length === 16 &&
-    yearStr.length === 4 &&
+    yearStr.length === 2 &&
     !hasYearError;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isFormValid) return;
+    if (!isFormValid || createCardMutation.isPending) return;
 
-    onAddCard({
-      id: `card-${Date.now()}`,
-      cardholderName: cardholderName.trim(),
-      last4: cleanNumber.slice(-4),
-      expiryDate,
-      brand,
-      balance: "0.00",
-      currency: "USD",
-    });
-
-    toast("Tarjeta agregada exitosamente", {
-      description: `Tarjeta terminada en ${cleanNumber.slice(-4)} vinculada.`,
-      duration: 4000,
-      style: {
-        background: "#E4D2D5",
-        backgroundColor: "#E4D2D5",
-        border: "1px solid #000000",
-        color: "#1A202C",
+    createCardMutation.mutate(
+      {
+        cardholder: cardholderName.trim(),
+        expiration_date: expiryDate,
+        last_four: cleanNumber.slice(-4),
       },
-    });
-
-    handleClose();
+      {
+        onSuccess: () => {
+          toast("Tarjeta agregada exitosamente", {
+            description: `Tarjeta terminada en ${cleanNumber.slice(-4)} vinculada.`,
+            duration: 4000,
+            style: {
+              background: "#E4D2D5",
+              backgroundColor: "#E4D2D5",
+              border: "1px solid #000000",
+              color: "#1A202C",
+            },
+          });
+          handleClose();
+        },
+        onError: (err) => {
+          toast("Error al registrar tarjeta", {
+            description:
+              err?.message || "No se pudo vincular la tarjeta en este momento.",
+            duration: 4000,
+            style: {
+              background: "#E4D2D5",
+              backgroundColor: "#E4D2D5",
+              border: "1px solid #000000",
+              color: "#1A202C",
+            },
+          });
+        },
+      }
+    );
   };
 
   return (
@@ -196,23 +206,20 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
             <span className="text-[12px] font-medium text-white/80">
               GranaBank Card
             </span>
-            {brand === "mastercard" ? (
-              <Image
-                src="/mastercard.png"
-                alt="Mastercard"
-                width={32}
-                height={20}
-                className="object-contain"
-              />
-            ) : (
-              <Image
-                src="/visa.png"
-                alt="Visa"
-                width={34}
-                height={14}
-                className="object-contain"
-              />
-            )}
+            {/* Icono de pago contactless */}
+            <svg
+              className="w-5 h-5 text-white/80 rotate-90"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3" />
+              <path d="M5 18a6 6 0 0 1 0-12" />
+              <path d="M2 21a9 9 0 0 1 0-18" />
+            </svg>
           </div>
 
           <div className="text-[16px] font-medium tracking-[0.18em] text-white">
@@ -233,7 +240,7 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
                 Exp. Date
               </span>
               <span className="text-[13px] font-medium">
-                {expiryDate || "MM/YEAR"}
+                {expiryDate || "MM/YY"}
               </span>
             </div>
           </div>
@@ -272,23 +279,7 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
                 required
               />
               <div className="absolute right-3.5 pointer-events-none">
-                {brand === "mastercard" ? (
-                  <Image
-                    src="/mastercard.png"
-                    alt="Mastercard"
-                    width={26}
-                    height={16}
-                    className="object-contain"
-                  />
-                ) : (
-                  <Image
-                    src="/visa.png"
-                    alt="Visa"
-                    width={28}
-                    height={12}
-                    className="object-contain"
-                  />
-                )}
+                <CreditCard className="w-5 h-5 text-[#A0AEC0]" />
               </div>
             </div>
           </div>
@@ -305,7 +296,7 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
               onChange={handleExpiryChange}
               onKeyDown={handleExpiryKeyDown}
               onBlur={() => setIsTouchedExpiry(true)}
-              placeholder="MM/YEAR"
+              placeholder="MM/YY"
               className={`w-full h-11 px-4 rounded-[14px] border bg-white text-[14px] outline-none transition-all ${
                 hasYearError
                   ? "border-[#E53E3E] text-[#E53E3E] focus:border-[#E53E3E] focus:ring-1 focus:ring-[#E53E3E]"
@@ -331,10 +322,10 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
             </button>
             <button
               type="submit"
-              disabled={!isFormValid}
+              disabled={!isFormValid || createCardMutation.isPending}
               className="flex-1 py-2.5 px-4 rounded-[16px] bg-[#7A1D2D] hover:bg-[#601724] disabled:bg-[#CBD5E0] disabled:cursor-not-allowed text-white font-medium text-[14px] transition-colors cursor-pointer shadow-sm text-center"
             >
-              Agregar tarjeta
+              {createCardMutation.isPending ? "Guardando..." : "Agregar tarjeta"}
             </button>
           </div>
         </form>

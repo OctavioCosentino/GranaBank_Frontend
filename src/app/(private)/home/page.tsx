@@ -1,86 +1,45 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { HomeHeader } from "@/components/home-header";
 import { CardCarousel, type CardData } from "@/components/card-carousel";
-import { TransactionCard, type TransactionType } from "@/components/transaction";
+import {
+  TransactionCard,
+  TransactionSkeleton,
+} from "@/components/transaction";
+import { EmptyState } from "@/components/feedback/empty-state";
 import { AddCardModal } from "@/components/add-card-modal";
 import { tokenManager } from "@/lib/token-manager";
+import { useCardsQuery } from "@/hooks/use-cards";
+import { useRecentTransactionsQuery } from "@/hooks/use-transactions";
+import {
+  formatTransactionAmount,
+  extractTransactions,
+} from "@/types/transaction";
 
-interface TransactionItem {
-  type: TransactionType;
-  title: string;
-  subtitle: string;
-  amount: string;
+// Genera un balance pseudo-aleatorio consistente según el ID de la tarjeta
+function generateRandomBalance(id: string): string {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = (hash << 5) - hash + id.charCodeAt(i);
+  }
+  const amount = (Math.abs(hash) % 4500) + 350;
+  return amount.toLocaleString("es-AR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
-
-// Tarjetas iniciales para el estado local
-const initialCards: CardData[] = [
-  {
-    id: "card-1",
-    balance: "978.85",
-    currency: "USD",
-    last4: "1234",
-    cardholderName: "Soy Granate",
-    expiryDate: "02/30",
-    brand: "mastercard",
-  },
-  {
-    id: "card-2",
-    balance: "1.450.00",
-    currency: "USD",
-    last4: "8821",
-    cardholderName: "Soy Granate",
-    expiryDate: "11/28",
-    brand: "visa",
-  },
-];
-
-// Datos de ejemplo limitados a máximo 6 para hidratar luego con el backend
-const sampleTransactions: TransactionItem[] = [
-  {
-    type: "SUS",
-    title: "Adobe",
-    subtitle: "Pago de suscripción",
-    amount: "$125",
-  },
-  {
-    type: "CASH_IN",
-    title: "Ronaldo",
-    subtitle: "Pago recibido",
-    amount: "$95",
-  },
-  {
-    type: "SUS",
-    title: "Figma",
-    subtitle: "Pago de suscripción",
-    amount: "$125",
-  },
-  {
-    type: "CASH_OUT",
-    title: "Juan Perez",
-    subtitle: "Pago enviado",
-    amount: "$95",
-  },
-  {
-    type: "SUS",
-    title: "Spotify",
-    subtitle: "Pago de suscripción",
-    amount: "$12",
-  },
-  {
-    type: "CASH_IN",
-    title: "Lucas Gomez",
-    subtitle: "Transferencia recibida",
-    amount: "$50",
-  },
-];
 
 // Página principal del usuario (primera pestaña: /home)
 export default function HomePage() {
   const [userName, setUserName] = useState("Granate");
-  const [cards, setCards] = useState<CardData[]>(initialCards);
   const [isAddCardOpen, setIsAddCardOpen] = useState(false);
+
+  const { data: backendCards = [], isLoading: isLoadingCards } = useCardsQuery();
+  const {
+    data: recentData,
+    isLoading: isLoadingTransactions,
+  } = useRecentTransactionsQuery(6);
 
   useEffect(() => {
     const profile = tokenManager.getProfile();
@@ -93,12 +52,47 @@ export default function HomePage() {
     }
   }, []);
 
-  // Máximo 6 movimientos
-  const displayTransactions = sampleTransactions.slice(0, 6);
+  // Transforma las tarjetas del backend o muestra tarjeta mock apagada si no hay ninguna
+  const displayCards: CardData[] = useMemo(() => {
+    if (backendCards.length === 0) {
+      return [
+        {
+          id: "empty-muted-card",
+          balance: "0,00",
+          currency: "USD",
+          last4: "••••",
+          cardholderName: "SIN TARJETAS ACTIVAS",
+          expiryDate: "--/--",
+          brand: "mastercard",
+          isMuted: true,
+        },
+      ];
+    }
 
-  const handleAddCard = (newCard: CardData) => {
-    setCards((prev) => [...prev, newCard]);
-  };
+    return backendCards.map((card) => ({
+      id: card.id,
+      balance: generateRandomBalance(card.id),
+      currency: "USD",
+      last4: card.last_four,
+      cardholderName: card.cardholder,
+      expiryDate: card.expiration_date,
+      brand: card.last_four.startsWith("4") ? "visa" : "mastercard",
+      isMuted: false,
+    }));
+  }, [backendCards]);
+
+  // Primeros 6 movimientos ordenados cronológicamente desde el más reciente
+  const recentTransactions = useMemo(() => {
+    if (!recentData) return [];
+    const list = extractTransactions(recentData);
+    return [...list]
+      .sort((a, b) => {
+        const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return timeB - timeA;
+      })
+      .slice(0, 6);
+  }, [recentData]);
 
   return (
     <main className="h-[calc(100dvh-72px)] overflow-hidden p-5 pb-1 flex flex-col items-center">
@@ -108,10 +102,11 @@ export default function HomePage() {
           <HomeHeader userName={userName} />
         </div>
 
-        {/* Carrusel fijo con modal de nueva tarjeta */}
+        {/* Carrusel con tarjetas reales o estado apagado */}
         <div className="shrink-0 mb-4">
           <CardCarousel
-            cards={cards}
+            cards={displayCards}
+            isLoading={isLoadingCards}
             onAddCard={() => setIsAddCardOpen(true)}
           />
         </div>
@@ -124,24 +119,34 @@ export default function HomePage() {
         {/* Listado con scroll independiente exclusivo para esta sección */}
         <div className="flex-1 overflow-y-auto min-h-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden pb-2 pr-0.5">
           <div className="flex flex-col">
-            {displayTransactions.map((tx, idx) => (
-              <TransactionCard
-                key={idx}
-                type={tx.type}
-                title={tx.title}
-                subtitle={tx.subtitle}
-                amount={tx.amount}
-              />
-            ))}
+            {isLoadingTransactions ? (
+              <>
+                <TransactionSkeleton />
+                <TransactionSkeleton />
+                <TransactionSkeleton />
+                <TransactionSkeleton />
+              </>
+            ) : recentTransactions.length === 0 ? (
+              <EmptyState type="no-transactions" />
+            ) : (
+              recentTransactions.map((tx) => (
+                <TransactionCard
+                  key={tx.id}
+                  type={tx.type}
+                  title={tx.title}
+                  subtitle={tx.subtitle}
+                  amount={formatTransactionAmount(tx.amount, tx.type)}
+                />
+              ))
+            )}
           </div>
         </div>
       </div>
 
-      {/* Modal para vincular nueva tarjeta */}
+      {/* Modal para vincular nueva tarjeta conectada al backend */}
       <AddCardModal
         isOpen={isAddCardOpen}
         onClose={() => setIsAddCardOpen(false)}
-        onAddCard={handleAddCard}
       />
     </main>
   );

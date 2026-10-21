@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import { Card } from "@/components/card";
+import { Card, CardSkeleton } from "@/components/card";
 
 export interface CardData {
   id?: string;
@@ -12,45 +12,28 @@ export interface CardData {
   cardholderName?: string;
   expiryDate?: string;
   brand?: "mastercard" | "visa" | string;
+  isMuted?: boolean;
 }
 
 interface CardCarouselProps {
   cards?: CardData[];
   onAddCard?: () => void;
   className?: string;
+  isLoading?: boolean;
 }
-
-// Datos de ejemplo para desarrollo antes de conectar con el backend
-const defaultCards: CardData[] = [
-  {
-    id: "card-1",
-    balance: "978.85",
-    currency: "USD",
-    last4: "1234",
-    cardholderName: "Soy Granate",
-    expiryDate: "02/30",
-    brand: "mastercard",
-  },
-  {
-    id: "card-2",
-    balance: "1.450.00",
-    currency: "USD",
-    last4: "8821",
-    cardholderName: "Soy Granate",
-    expiryDate: "11/28",
-    brand: "visa",
-  },
-];
 
 // Carrusel de tarjetas bancarias con scroll táctil, arrastre con mouse y botones de navegación
 export const CardCarousel: React.FC<CardCarouselProps> = ({
-  cards = defaultCards,
+  cards = [],
   onAddCard,
   className = "",
+  isLoading = false,
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const lastWheelTime = useRef(0);
 
   // Estados para soportar arrastre con mouse en computadoras
   const isDragging = useRef(false);
@@ -65,15 +48,6 @@ export const CardCarousel: React.FC<CardCarouselProps> = ({
     setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
   };
 
-  useEffect(() => {
-    checkScrollPosition();
-    const scroller = scrollRef.current;
-    if (scroller) {
-      scroller.addEventListener("scroll", checkScrollPosition, { passive: true });
-      return () => scroller.removeEventListener("scroll", checkScrollPosition);
-    }
-  }, [cards]);
-
   // Desplaza el carrusel hacia la izquierda o derecha
   const scroll = (direction: "left" | "right") => {
     if (!scrollRef.current) return;
@@ -81,6 +55,57 @@ export const CardCarousel: React.FC<CardCarouselProps> = ({
     const scrollAmount = direction === "left" ? -cardWidth : cardWidth;
     scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
   };
+
+  useEffect(() => {
+    checkScrollPosition();
+    const scroller = scrollRef.current;
+    if (scroller) {
+      scroller.addEventListener("scroll", checkScrollPosition, { passive: true });
+      window.addEventListener("resize", checkScrollPosition);
+      return () => {
+        scroller.removeEventListener("scroll", checkScrollPosition);
+        window.removeEventListener("resize", checkScrollPosition);
+      };
+    }
+  }, [cards]);
+
+  // Desplazamiento horizontal con la rueda del mouse al pasar por encima
+  useEffect(() => {
+    const container = containerRef.current;
+    const scroller = scrollRef.current;
+    if (!container || !scroller) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      if (Math.abs(delta) < 10) return;
+
+      if (scroller.scrollWidth > scroller.clientWidth) {
+        e.preventDefault();
+        const now = Date.now();
+        if (now - lastWheelTime.current > 220) {
+          lastWheelTime.current = now;
+          if (delta > 0) {
+            scroll("right");
+          } else {
+            scroll("left");
+          }
+        }
+      }
+    };
+
+    container.addEventListener("wheel", handleWheel, { passive: false });
+    return () => container.removeEventListener("wheel", handleWheel);
+  }, []);
+
+  // Vuelve el carrusel a la izquierda de todo al agregar o actualizar tarjetas
+  const prevCardsSignature = useRef(cards.map((c) => c.id).join(","));
+  useEffect(() => {
+    const currentSignature = cards.map((c) => c.id).join(",");
+    if (prevCardsSignature.current !== currentSignature && scrollRef.current) {
+      scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
+    }
+    prevCardsSignature.current = currentSignature;
+  }, [cards]);
 
   // Manejadores para arrastre de mouse
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -103,7 +128,7 @@ export const CardCarousel: React.FC<CardCarouselProps> = ({
   };
 
   return (
-    <div className={`relative w-full ${className}`}>
+    <div ref={containerRef} className={`relative w-full ${className}`}>
       {/* Botón flecha izquierda */}
       {canScrollLeft && (
         <button
@@ -123,21 +148,28 @@ export const CardCarousel: React.FC<CardCarouselProps> = ({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUpOrLeave}
         onMouseLeave={handleMouseUpOrLeave}
-        className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-3 pt-1 px-1 -mx-1 select-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden cursor-grab active:cursor-grabbing"
+        className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-3 pt-1 px-0.5 select-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden cursor-grab active:cursor-grabbing"
       >
-        {/* Renderizado del array de tarjetas del back */}
-        {cards.map((card, index) => (
-          <div key={card.id || index} className="snap-start shrink-0">
-            <Card
-              balance={card.balance}
-              currency={card.currency}
-              last4={card.last4}
-              cardholderName={card.cardholderName}
-              expiryDate={card.expiryDate}
-              brand={card.brand}
-            />
+        {/* Renderizado de skeletons durante carga o tarjetas del backend */}
+        {isLoading ? (
+          <div className="w-[340px] snap-start shrink-0">
+            <CardSkeleton />
           </div>
-        ))}
+        ) : (
+          cards.map((card, index) => (
+            <div key={card.id || index} className="w-[340px] snap-start shrink-0">
+              <Card
+                balance={card.balance}
+                currency={card.currency}
+                last4={card.last4}
+                cardholderName={card.cardholderName}
+                expiryDate={card.expiryDate}
+                brand={card.brand}
+                isMuted={card.isMuted}
+              />
+            </div>
+          ))
+        )}
 
         {/* Tarjeta final para añadir una nueva tarjeta */}
         <div className="snap-start shrink-0">

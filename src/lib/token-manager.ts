@@ -54,6 +54,7 @@ class TokenManager {
       localStorage.setItem(SESSION_DATA_KEY, sessionPayload);
 
       this.setCookie(COOKIE_NAME, session.access_token, THIRTY_DAYS_SECONDS);
+      this.setCookie("granabank_remember", "true", THIRTY_DAYS_SECONDS);
     } else {
       // Recordarme inactivo: almacenamiento únicamente en la sesión del navegador
       localStorage.removeItem(ACCESS_TOKEN_KEY);
@@ -65,6 +66,7 @@ class TokenManager {
       sessionStorage.setItem(SESSION_DATA_KEY, sessionPayload);
 
       this.setCookie(COOKIE_NAME, session.access_token);
+      this.deleteCookie("granabank_remember");
     }
   }
 
@@ -138,6 +140,7 @@ class TokenManager {
     sessionStorage.removeItem(SESSION_DATA_KEY);
 
     this.deleteCookie(COOKIE_NAME);
+    this.deleteCookie("granabank_remember");
   }
 
   private setCookie(name: string, value: string, maxAgeSeconds?: number): void {
@@ -148,7 +151,7 @@ class TokenManager {
 
   private deleteCookie(name: string): void {
     if (typeof document === "undefined") return;
-    document.cookie = `${name}=; path=/; max-age=0; SameSite=Lax`;
+    document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0; SameSite=Lax`;
   }
 }
 
