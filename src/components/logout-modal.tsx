@@ -38,12 +38,10 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
       onClick={onClose}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-200"
     >
-      {/* Contenedor del modal */}
       <div
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-[360px] bg-[#FFFFFF] rounded-[24px] p-6 shadow-xl border border-[#F0F2F5] relative animate-in zoom-in-95 duration-200"
       >
-        {/* Botón de cierre X */}
         <button
           type="button"
           onClick={onClose}
@@ -65,7 +63,6 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
           </svg>
         </button>
 
-        {/* Icono de cerrar sesión */}
         <div className="w-14 h-14 rounded-full bg-[#E4D2D5]/50 flex items-center justify-center mx-auto mb-4 text-[#7A1D2D]">
           <svg
             width="26"
@@ -98,7 +95,6 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
           </svg>
         </div>
 
-        {/* Título y descripción */}
         <h3
           id="logout-modal-title"
           className="text-lg font-semibold text-[#1A202C] text-center mb-1.5"
@@ -106,10 +102,10 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
           ¿Cerrar sesión?
         </h3>
         <p className="text-sm text-[#718096] text-center mb-6 leading-relaxed">
-          ¿Estás seguro de que deseas salir? Tendrás que volver a iniciar sesión para ingresar.
+          ¿Estás seguro de que deseas salir? Tendrás que volver a iniciar sesión
+          para ingresar.
         </p>
 
-        {/* Acciones */}
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -130,4 +126,3 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
     </div>
   );
 };
-

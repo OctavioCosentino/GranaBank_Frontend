@@ -10,8 +10,9 @@ export const cardService = {
   },
 
   // Registra una nueva tarjeta vinculada al usuario
-  createCard: async (data: CreateCardDto): Promise<ApiResponse<BackendCard>> => {
+  createCard: async (
+    data: CreateCardDto,
+  ): Promise<ApiResponse<BackendCard>> => {
     return apiClient.post<BackendCard>("/cards", data);
   },
 };
-

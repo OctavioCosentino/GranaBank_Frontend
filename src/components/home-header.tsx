@@ -15,7 +15,6 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
 }) => {
   return (
     <header className="w-full flex items-center justify-between mb-6 pt-2">
-      {/* Saludo y nombre de usuario */}
       <div className="flex flex-col">
         <span className="text-[14px] text-[#718096] font-normal leading-tight">
           Hola
@@ -27,7 +26,6 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
 
       {/* Botones de acción: Búsqueda y Notificaciones */}
       <div className="flex items-center gap-3">
-        {/* Botón de búsqueda (redirige a la pestaña /transactions) */}
         <Link
           href="/transactions?focus=true"
           className="w-10 h-10 flex items-center justify-center text-[#200E32] hover:text-[#7A1D2D] active:text-[#7A1D2D] focus:text-[#7A1D2D] transition-colors cursor-pointer outline-none"

@@ -3,10 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { HomeHeader } from "@/components/home-header";
 import { CardCarousel, type CardData } from "@/components/card-carousel";
-import {
-  TransactionCard,
-  TransactionSkeleton,
-} from "@/components/transaction";
+import { TransactionCard, TransactionSkeleton } from "@/components/transaction";
 import { EmptyState } from "@/components/feedback/empty-state";
 import { AddCardModal } from "@/components/add-card-modal";
 import { tokenManager } from "@/lib/token-manager";
@@ -35,11 +32,10 @@ export default function HomePage() {
   const [userName, setUserName] = useState("Granate");
   const [isAddCardOpen, setIsAddCardOpen] = useState(false);
 
-  const { data: backendCards = [], isLoading: isLoadingCards } = useCardsQuery();
-  const {
-    data: recentData,
-    isLoading: isLoadingTransactions,
-  } = useRecentTransactionsQuery(6);
+  const { data: backendCards = [], isLoading: isLoadingCards } =
+    useCardsQuery();
+  const { data: recentData, isLoading: isLoadingTransactions } =
+    useRecentTransactionsQuery(6);
 
   useEffect(() => {
     const profile = tokenManager.getProfile();

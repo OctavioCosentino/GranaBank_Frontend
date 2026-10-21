@@ -4,7 +4,8 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("granabank_token")?.value;
-  const isRemembered = request.cookies.get("granabank_remember")?.value === "true";
+  const isRemembered =
+    request.cookies.get("granabank_remember")?.value === "true";
 
   const isPrivateRoute =
     pathname.startsWith("/home") || pathname.startsWith("/transactions");

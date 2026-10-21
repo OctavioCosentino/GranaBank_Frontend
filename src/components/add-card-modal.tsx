@@ -151,7 +151,7 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
             },
           });
         },
-      }
+      },
     );
   };
 
@@ -167,7 +167,6 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-[390px] bg-[#FFFFFF] rounded-[24px] p-6 shadow-2xl border border-[#F0F2F5] relative animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       >
-        {/* Botón X de cierre */}
         <button
           type="button"
           onClick={handleClose}
@@ -206,7 +205,6 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
             <span className="text-[12px] font-medium text-white/80">
               GranaBank Card
             </span>
-            {/* Icono de pago contactless */}
             <svg
               className="w-5 h-5 text-white/80 rotate-90"
               viewBox="0 0 24 24"
@@ -248,7 +246,6 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
 
         {/* Formulario */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
-          {/* Input Nombre del titular */}
           <div className="flex flex-col gap-1">
             <label className="text-[13px] font-medium text-[#4A5568]">
               Nombre del titular
@@ -263,7 +260,6 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
             />
           </div>
 
-          {/* Input Número de tarjeta */}
           <div className="flex flex-col gap-1">
             <label className="text-[13px] font-medium text-[#4A5568]">
               Número de tarjeta
@@ -284,7 +280,6 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
             </div>
           </div>
 
-          {/* Input Fecha de vencimiento */}
           <div className="flex flex-col gap-1">
             <label className="text-[13px] font-medium text-[#4A5568]">
               Fecha de vencimiento
@@ -311,7 +306,6 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
             )}
           </div>
 
-          {/* Acciones con altura idéntica en ambos botones */}
           <div className="flex items-center gap-3 mt-4">
             <button
               type="button"
@@ -325,7 +319,9 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
               disabled={!isFormValid || createCardMutation.isPending}
               className="flex-1 h-11 px-3 rounded-[16px] bg-[#7A1D2D] hover:bg-[#601724] active:scale-[0.98] disabled:bg-[#CBD5E0] disabled:cursor-not-allowed text-white font-medium text-[14px] transition-all cursor-pointer shadow-sm flex items-center justify-center whitespace-nowrap text-center"
             >
-              {createCardMutation.isPending ? "Guardando..." : "Agregar tarjeta"}
+              {createCardMutation.isPending
+                ? "Guardando..."
+                : "Agregar tarjeta"}
             </button>
           </div>
         </form>

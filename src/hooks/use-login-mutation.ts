@@ -24,7 +24,8 @@ export function useLoginMutation() {
 
       // Permite respuestas tanto envueltas en data como directas
       const responseAny = response as unknown as Record<string, unknown>;
-      const payload = (response?.data || responseAny) as unknown as LoginResponseData;
+      const payload = (response?.data ||
+        responseAny) as unknown as LoginResponseData;
 
       if (!payload?.session?.access_token) {
         const rawMessage =
@@ -43,8 +44,10 @@ export function useLoginMutation() {
       tokenManager.saveSession(data, rememberMe);
 
       if (data.user) queryClient.setQueryData(QUERY_KEYS.auth.user, data.user);
-      if (data.session) queryClient.setQueryData(QUERY_KEYS.auth.session, data.session);
-      if (data.profile) queryClient.setQueryData(QUERY_KEYS.auth.profile, data.profile);
+      if (data.session)
+        queryClient.setQueryData(QUERY_KEYS.auth.session, data.session);
+      if (data.profile)
+        queryClient.setQueryData(QUERY_KEYS.auth.profile, data.profile);
 
       router.push("/home");
     },
@@ -83,4 +86,3 @@ export function useLoginMutation() {
     },
   });
 }
-

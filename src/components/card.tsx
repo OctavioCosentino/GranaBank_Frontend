@@ -31,14 +31,12 @@ export const Card: React.FC<CardProps> = ({
     <div
       className={`w-full h-[200px] p-5 rounded-[24px] flex flex-col justify-between select-none ${bgStyles} ${className}`}
     >
-      {/* Fila superior: Balance y Logo de la marca */}
       <div className="flex items-start justify-between">
         <div className="flex flex-col">
           <span className="text-[14px] font-normal leading-tight opacity-90">
             Balance
           </span>
           <div className="flex items-center gap-2.5 mt-1.5">
-            {/* Badge de divisa */}
             <span
               className={`px-2 py-0.5 rounded-[7px] text-[12px] font-semibold shadow-xs ${
                 isMuted
@@ -54,7 +52,6 @@ export const Card: React.FC<CardProps> = ({
           </div>
         </div>
 
-        {/* Logo de la franquicia */}
         <div className="flex items-center justify-center">
           {brand === "mastercard" ? (
             <Image
@@ -76,12 +73,10 @@ export const Card: React.FC<CardProps> = ({
         </div>
       </div>
 
-      {/* Fila media: Número enmascarado */}
       <div className="text-[17px] font-medium tracking-[0.22em] my-auto">
         **** **** **** {last4}
       </div>
 
-      {/* Fila inferior: Titular y Fecha de vencimiento */}
       <div className="flex items-end justify-between">
         <span className="text-[15px] font-medium leading-tight truncate max-w-[200px]">
           {cardholderName}
@@ -131,4 +126,3 @@ export const CardSkeleton: React.FC<{ className?: string }> = ({
     </div>
   );
 };
-

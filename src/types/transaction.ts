@@ -35,7 +35,7 @@ export interface GetTransactionsParams {
 // Formatea el importe numérico con signo según el tipo de movimiento
 export function formatTransactionAmount(
   amount: number | string,
-  type: TransactionType
+  type: TransactionType,
 ): string {
   if (
     typeof amount === "string" &&
@@ -63,11 +63,14 @@ export function extractTransactions(payload: unknown): BackendTransaction[] {
   if (Array.isArray(p)) return p as BackendTransaction[];
   if (p.data && typeof p.data === "object") {
     const nested = p.data as Record<string, unknown>;
-    if (Array.isArray(nested.transactions)) return nested.transactions as BackendTransaction[];
-    if (Array.isArray(nested.items)) return nested.items as BackendTransaction[];
+    if (Array.isArray(nested.transactions))
+      return nested.transactions as BackendTransaction[];
+    if (Array.isArray(nested.items))
+      return nested.items as BackendTransaction[];
     if (Array.isArray(nested.data)) return nested.data as BackendTransaction[];
   }
-  if (Array.isArray(p.transactions)) return p.transactions as BackendTransaction[];
+  if (Array.isArray(p.transactions))
+    return p.transactions as BackendTransaction[];
   if (Array.isArray(p.items)) return p.items as BackendTransaction[];
   return [];
 }

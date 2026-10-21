@@ -72,7 +72,9 @@ export function FilterBar<T extends string = string>({
     const timer = setTimeout(updateScrollProgress, 60);
     const scroller = scrollRef.current;
     if (scroller) {
-      scroller.addEventListener("scroll", updateScrollProgress, { passive: true });
+      scroller.addEventListener("scroll", updateScrollProgress, {
+        passive: true,
+      });
       window.addEventListener("resize", updateScrollProgress);
       return () => {
         clearTimeout(timer);
@@ -134,4 +136,3 @@ export function FilterBar<T extends string = string>({
     </div>
   );
 }
-

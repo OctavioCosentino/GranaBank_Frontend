@@ -10,7 +10,7 @@ export function cn(...inputs: ClassValue[]): string {
 export function formatCurrency(
   amount: number,
   currency: string = "USD",
-  locale: string = "es-AR"
+  locale: string = "es-AR",
 ): string {
   return new Intl.NumberFormat(locale, {
     style: "currency",
@@ -21,7 +21,7 @@ export function formatCurrency(
 // Formateador de fecha localizado
 export function formatDate(
   date: Date | string,
-  locale: string = "es-AR"
+  locale: string = "es-AR",
 ): string {
   const d = typeof date === "string" ? new Date(date) : date;
   return new Intl.DateTimeFormat(locale, {

@@ -10,8 +10,10 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-anon-key";
+  const url =
+    process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
+  const anonKey =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-anon-key";
 
   const supabase = createServerClient<Database>(url, anonKey, {
     cookies: {
@@ -20,13 +22,13 @@ export async function updateSession(request: NextRequest) {
       },
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value }) =>
-          request.cookies.set(name, value)
+          request.cookies.set(name, value),
         );
         response = NextResponse.next({
           request,
         });
         cookiesToSet.forEach(({ name, value, options }) =>
-          response.cookies.set(name, value, options)
+          response.cookies.set(name, value, options),
         );
       },
     },

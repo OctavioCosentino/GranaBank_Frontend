@@ -13,4 +13,3 @@ export interface CreateCardDto {
   expiration_date: string;
   last_four: string;
 }
-

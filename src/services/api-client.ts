@@ -20,7 +20,7 @@ export class ApiClient {
 
   private buildUrl(
     endpoint: string,
-    params?: Record<string, string | number | boolean | undefined>
+    params?: Record<string, string | number | boolean | undefined>,
   ): string {
     const url = new URL(`${this.baseUrl}/${endpoint.replace(/^\//, "")}`);
 
@@ -35,7 +35,10 @@ export class ApiClient {
     return url.toString();
   }
 
-  async request<T>(endpoint: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
+  async request<T>(
+    endpoint: string,
+    options: RequestOptions = {},
+  ): Promise<ApiResponse<T>> {
     const { params, headers = {}, ...customConfig } = options;
     const token = await this.getAuthToken();
 
@@ -64,16 +67,15 @@ export class ApiClient {
         } else if (Array.isArray(responseBody?.message)) {
           errorMessage = responseBody.message
             .map((item: unknown) =>
-              typeof item === "string" ? item : JSON.stringify(item)
+              typeof item === "string" ? item : JSON.stringify(item),
             )
             .join(", ");
         } else if (
           responseBody?.message &&
           typeof responseBody.message === "object"
         ) {
-          const innerMsg = (
-            responseBody.message as Record<string, unknown>
-          ).message;
+          const innerMsg = (responseBody.message as Record<string, unknown>)
+            .message;
           errorMessage =
             typeof innerMsg === "string"
               ? innerMsg

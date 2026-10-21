@@ -74,7 +74,9 @@ export default function LoginPage() {
         onError: (err: unknown) => {
           const errorObj = err as Record<string, unknown> | null;
           const statusCode =
-            typeof errorObj?.statusCode === "number" ? errorObj.statusCode : 500;
+            typeof errorObj?.statusCode === "number"
+              ? errorObj.statusCode
+              : 500;
           const message =
             typeof errorObj?.message === "string"
               ? errorObj.message.toLowerCase()
@@ -95,7 +97,7 @@ export default function LoginPage() {
             setHasCredentialsError(true);
           }
         },
-      }
+      },
     );
   };
 

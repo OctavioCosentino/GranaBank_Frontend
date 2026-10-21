@@ -60,7 +60,9 @@ export const CardCarousel: React.FC<CardCarouselProps> = ({
     checkScrollPosition();
     const scroller = scrollRef.current;
     if (scroller) {
-      scroller.addEventListener("scroll", checkScrollPosition, { passive: true });
+      scroller.addEventListener("scroll", checkScrollPosition, {
+        passive: true,
+      });
       window.addEventListener("resize", checkScrollPosition);
       return () => {
         scroller.removeEventListener("scroll", checkScrollPosition);
@@ -76,7 +78,8 @@ export const CardCarousel: React.FC<CardCarouselProps> = ({
     if (!container || !scroller) return;
 
     const handleWheel = (e: WheelEvent) => {
-      const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      const delta =
+        Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
       if (Math.abs(delta) < 10) return;
 
       if (scroller.scrollWidth > scroller.clientWidth) {
@@ -129,7 +132,6 @@ export const CardCarousel: React.FC<CardCarouselProps> = ({
 
   return (
     <div ref={containerRef} className={`relative w-full ${className}`}>
-      {/* Botón flecha izquierda */}
       {canScrollLeft && (
         <button
           type="button"
@@ -157,7 +159,10 @@ export const CardCarousel: React.FC<CardCarouselProps> = ({
           </div>
         ) : (
           cards.map((card, index) => (
-            <div key={card.id || index} className="w-[340px] snap-start shrink-0">
+            <div
+              key={card.id || index}
+              className="w-[340px] snap-start shrink-0"
+            >
               <Card
                 balance={card.balance}
                 currency={card.currency}
@@ -189,7 +194,6 @@ export const CardCarousel: React.FC<CardCarouselProps> = ({
         </div>
       </div>
 
-      {/* Botón flecha derecha */}
       {canScrollRight && (
         <button
           type="button"
@@ -203,4 +207,3 @@ export const CardCarousel: React.FC<CardCarouselProps> = ({
     </div>
   );
 };
-

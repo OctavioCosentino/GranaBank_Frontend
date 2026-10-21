@@ -101,13 +101,14 @@ export const TransactionCard: React.FC<TransactionCardProps> = ({
         </div>
       </div>
 
-      <div className={`text-[15px] font-medium whitespace-nowrap ml-3 shrink-0 ${currentStyle.textPrincipal}`}>
+      <div
+        className={`text-[15px] font-medium whitespace-nowrap ml-3 shrink-0 ${currentStyle.textPrincipal}`}
+      >
         {amount}
       </div>
     </div>
   );
 };
-
 
 // Skeleton animado para indicar estado de carga de un movimiento financiero
 export const TransactionSkeleton: React.FC<{ className?: string }> = ({
@@ -118,17 +119,14 @@ export const TransactionSkeleton: React.FC<{ className?: string }> = ({
       className={`flex items-center justify-between w-full px-5 py-4 bg-[#FFFFFF] rounded-2xl shadow-sm mb-4 animate-pulse select-none ${className}`}
     >
       <div className="flex items-center gap-4">
-        {/* Icono skeleton */}
         <div className="w-12 h-12 rounded-[14px] bg-[#E2E8F0]" />
 
-        {/* Textos skeleton */}
         <div className="flex flex-col gap-2">
           <div className="w-28 h-4 bg-[#E2E8F0] rounded" />
           <div className="w-36 h-3 bg-[#EDF2F7] rounded" />
         </div>
       </div>
 
-      {/* Monto skeleton */}
       <div className="w-12 h-4 bg-[#E2E8F0] rounded" />
     </div>
   );

@@ -8,7 +8,7 @@ import type {
 export const transactionService = {
   // Obtiene el listado de transacciones con soporte de paginación, búsqueda y filtros
   getTransactions: async (
-    params?: GetTransactionsParams
+    params?: GetTransactionsParams,
   ): Promise<TransactionsQueryResponse> => {
     const queryParams: Record<string, string | number | undefined> = {
       page: params?.page ?? 1,
@@ -24,4 +24,3 @@ export const transactionService = {
     return response as unknown as TransactionsQueryResponse;
   },
 };
-

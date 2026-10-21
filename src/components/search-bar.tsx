@@ -8,8 +8,10 @@ import React, {
   useImperativeHandle,
 } from "react";
 
-export interface SearchBarProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> {
+export interface SearchBarProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "type"
+> {
   onSearch?: (value: string) => void;
   containerClassName?: string;
   autoFocus?: boolean;
@@ -59,7 +61,6 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(
       <div
         className={`group relative flex items-center w-full h-[52px] px-4 rounded-[20px] bg-white border border-[#E2E8F0] shadow-sm transition-all focus-within:border-[#7A1D2D] focus-within:ring-1 focus-within:ring-inset focus-within:ring-[#7A1D2D] ${containerClassName}`}
       >
-        {/* Icono de lupa reactivo al foco/escritura */}
         <div className="flex items-center justify-center shrink-0 text-[#A0AEC0] group-focus-within:text-[#7A1D2D] transition-colors mr-3">
           <svg
             width="19"
@@ -85,7 +86,6 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(
           </svg>
         </div>
 
-        {/* Input de búsqueda optimizado para teclado móvil limpio sin barras de autocompletado */}
         <input
           ref={inputRef}
           type="text"

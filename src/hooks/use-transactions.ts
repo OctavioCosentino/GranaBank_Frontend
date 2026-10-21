@@ -50,4 +50,3 @@ export function useInfiniteTransactionsQuery({
     initialPageParam: 1,
   });
 }
-
