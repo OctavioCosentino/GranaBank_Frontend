@@ -1,6 +1,6 @@
 # GranaBank Frontend
 
-Plataforma financiera y banca digital **GranaBank** desarrollada con **Next.js (App Router)**, **TypeScript**, **Tailwind CSS**, **TanStack Query v5**, arquitectura modular y cliente HTTP preparado para backend externo y despliegues optimizados en **Vercel**.
+Plataforma financiera digital **GranaBank** desarrollada con **Next.js (App Router)**, **TypeScript**, **Tailwind CSS**, **TanStack Query v5**, arquitectura modular y cliente HTTP preparado para backend externo y despliegues optimizados en **Vercel**.
 
 ---
 
@@ -22,51 +22,51 @@ El proyecto está organizado bajo una estructura modular orientada al dominio y 
 
 ```text
 src/
-├── app/                      # Rutas y páginas (Next.js App Router)
-│   ├── (public)/             # Rutas públicas (Login)
-│   │   └── page.tsx          # Pantalla de acceso
-│   ├── (private)/            # Rutas protegidas (Home, Movimientos)
-│   │   ├── layout.tsx        # Layout privado (guard de cliente + BottomBar)
-│   │   ├── home/             # Vista principal con tarjetas y últimos movimientos
-│   │   └── transactions/     # Vista de movimientos con búsqueda y filtros
-│   ├── not-found.tsx         # Página 404 minimalista GranaBank
-│   ├── layout.tsx            # Layout raíz (fuente Poppins, QueryProvider, Toaster)
-│   └── globals.css           # Estilos base y variables globales
-├── components/               # Biblioteca de componentes UI y features
-│   ├── feedback/             # Spinners, skeletons y estados vacíos (EmptyState)
-│   ├── providers/            # QueryProvider para TanStack Query
-│   ├── add-card-modal.tsx    # Modal para registrar nuevas tarjetas
-│   ├── bottom-bar.tsx        # Barra de navegación móvil persistente
-│   ├── card-carousel.tsx     # Carrusel táctil con soporte de arrastre y rueda
-│   ├── card.tsx              # Tarjeta corporativa GranaBank y CardSkeleton
-│   ├── filter-bar.tsx        # Barra de filtros con mini slider indicador
-│   ├── home-header.tsx       # Encabezado del dashboard
-│   ├── search-bar.tsx        # Barra de búsqueda con autoenfoque e iconos
-│   └── transaction.tsx       # Componente de transacción y TransactionSkeleton
-├── constants/                # Claves de Query y rutas centralizadas
-│   ├── query-keys.ts         # Claves de consulta estructuradas y tipadas
-│   └── routes.ts             # Rutas de la aplicación
-├── hooks/                    # Hooks personalizados desacoplados
-│   ├── use-cards.ts          # Queries y mutaciones de tarjetas
-│   ├── use-login-mutation.ts # Mutación de inicio de sesión
-│   └── use-transactions.ts   # Queries infinitas y recientes de movimientos
-├── lib/                      # Configuraciones y utilidades compartidas
-│   ├── supabase/             # Clientes de Supabase (@supabase/ssr)
-│   ├── env.ts                # Variables de entorno validadas
-│   ├── query-client.ts       # Configuración centralizada de TanStack Query
-│   ├── token-manager.ts      # Gestor de tokens y ciclo de vida de sesión
-│   └── utils.ts              # Utilidades de combinación de clases (cn)
-├── services/                 # Servicios HTTP hacia el backend
-│   ├── api-client.ts         # Cliente HTTP con inyección automática de Bearer Token
-│   ├── auth-service.ts       # Endpoints de autenticación
-│   ├── card-service.ts       # Endpoints de tarjetas
-│   └── transaction-service.ts# Endpoints de movimientos con paginación
-├── types/                    # Tipos e interfaces de TypeScript
-│   ├── api.ts                # Respuestas y errores HTTP estandarizados
-│   ├── auth.ts               # Modelos de sesión, perfil y credenciales
-│   ├── card.ts               # Modelos y DTOs de tarjetas
-│   └── transaction.ts        # Modelos de movimientos y metadatos de paginación
-└── middleware.ts             # Middleware en Edge para protección perimetral de rutas
+├── app/                         # Rutas y páginas (Next.js App Router)
+│   ├── (public)/                # Rutas públicas (Login)
+│   │   └── page.tsx             # Pantalla de acceso
+│   ├── (private)/               # Rutas protegidas (Home, Movimientos)
+│   │   ├── layout.tsx           # Layout privado (guard de cliente + BottomBar)
+│   │   ├── home/                # Vista principal con tarjetas y últimos movimientos
+│   │   └── transactions/        # Vista de movimientos con búsqueda y filtros
+│   ├── not-found.tsx            # Página 404 minimalista GranaBank
+│   ├── layout.tsx               # Layout raíz (fuente Poppins, QueryProvider, Toaster)
+│   └── globals.css              # Estilos base y variables globales
+├── components/                  # Biblioteca de componentes UI y features
+│   ├── feedback/                # Spinners, skeletons y estados vacíos (EmptyState)
+│   ├── providers/               # QueryProvider para TanStack Query
+│   ├── add-card-modal.tsx       # Modal para registrar nuevas tarjetas
+│   ├── bottom-bar.tsx           # Barra de navegación móvil persistente
+│   ├── card-carousel.tsx        # Carrusel táctil con soporte de arrastre y rueda
+│   ├── card.tsx                 # Tarjeta corporativa GranaBank y CardSkeleton
+│   ├── filter-bar.tsx           # Barra de filtros con mini slider indicador
+│   ├── home-header.tsx          # Encabezado del dashboard
+│   ├── search-bar.tsx           # Barra de búsqueda con autoenfoque e iconos
+│   └── transaction.tsx          # Componente de transacción y TransactionSkeleton
+├── constants/                   # Claves de Query y rutas centralizadas
+│   ├── query-keys.ts            # Claves de consulta estructuradas y tipadas
+│   └── routes.ts                # Rutas de la aplicación
+├── hooks/                       # Hooks personalizados desacoplados
+│   ├── use-cards.ts             # Queries y mutaciones de tarjetas
+│   ├── use-login-mutation.ts    # Mutación de inicio de sesión
+│   └── use-transactions.ts      # Queries infinitas y recientes de movimientos
+├── lib/                         # Configuraciones y utilidades compartidas
+│   ├── supabase/                # Clientes de Supabase (@supabase/ssr)
+│   ├── env.ts                   # Variables de entorno validadas
+│   ├── query-client.ts          # Configuración centralizada de TanStack Query
+│   ├── token-manager.ts         # Gestor de tokens y ciclo de vida de sesión
+│   └── utils.ts                 # Utilidades de combinación de clases (cn)
+├── services/                    # Servicios HTTP hacia el backend
+│   ├── api-client.ts            # Cliente HTTP con inyección automática de Bearer Token
+│   ├── auth-service.ts          # Endpoints de autenticación
+│   ├── card-service.ts          # Endpoints de tarjetas
+│   └── transaction-service.ts   # Endpoints de movimientos con paginación
+├── types/                       # Tipos e interfaces de TypeScript
+│   ├── api.ts                   # Respuestas y errores HTTP estandarizados
+│   ├── auth.ts                  # Modelos de sesión, perfil y credenciales
+│   ├── card.ts                  # Modelos y DTOs de tarjetas
+│   └── transaction.ts           # Modelos de movimientos y metadatos de paginación
+└── middleware.ts                # Middleware en Edge para protección perimetral de rutas
 ```
 
 ---
@@ -90,11 +90,7 @@ La aplicación implementa un esquema de **doble capa de seguridad** utilizando l
    - Verifica en tiempo real la presencia del token en el almacenamiento correspondiente (`localStorage` o `sessionStorage`).
    - Si no hay token activo, purga cualquier rastro residual de cookies y redirige al login sin destellos de contenido desautenticado.
 
-### 3. Página 404 Personalizada ([`src/app/not-found.tsx`](src/app/not-found.tsx))
-
-- Cualquier ruta inexistente o no contemplada es interceptada automáticamente por la página 404.
-- Diseñada con la identidad visual GranaBank (badge en tono granate suave `#E4D2D5`, tipografía destacada y botón adaptable).
-- El botón de retorno resuelve dinámicamente el destino: redirige a `/home` si el usuario tiene sesión activa, o a `/` si no está autenticado.
+> **Nota**: Las rutas no existentes son interceptadas por una página 404 personalizada ([`src/app/not-found.tsx`](src/app/not-found.tsx)), que redirige al usuario al inicio según su estado de sesión.
 
 ---
 
@@ -110,7 +106,7 @@ Toda la comunicación de datos asíncronos con el backend externo se gestiona me
 
 ### 2. Claves de Consulta Centralizadas ([`src/constants/query-keys.ts`](src/constants/query-keys.ts))
 
-Las claves de consulta se definen en un único archivo bajo objetos inmutables con funciones factoría para evitar colisiones de caché:
+Las claves de consulta se definen en un único archivo bajo objetos inmutables con funciones factory para evitar colisiones de caché:
 
 ```typescript
 export const QUERY_KEYS = {
@@ -209,10 +205,6 @@ pnpm install
 ```
 
 2. Configurar las variables de entorno creando el archivo `.env.local`:
-
-```bash
-cp .env.example .env.local
-```
 
 Configurar las variables según el entorno:
 

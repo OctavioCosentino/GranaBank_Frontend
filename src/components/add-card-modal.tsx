@@ -311,19 +311,19 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
             )}
           </div>
 
-          {/* Acciones */}
-          <div className="flex items-center gap-3 mt-3">
+          {/* Acciones con altura idéntica en ambos botones */}
+          <div className="flex items-center gap-3 mt-4">
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 py-2.5 px-4 rounded-[16px] border border-[#E2E8F0] text-[#4A5568] font-medium text-[14px] hover:bg-[#F8FAFC] transition-colors cursor-pointer text-center"
+              className="flex-1 h-11 px-3 rounded-[16px] border border-[#E2E8F0] text-[#4A5568] font-medium text-[14px] hover:bg-[#F8FAFC] active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center whitespace-nowrap text-center"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={!isFormValid || createCardMutation.isPending}
-              className="flex-1 py-2.5 px-4 rounded-[16px] bg-[#7A1D2D] hover:bg-[#601724] disabled:bg-[#CBD5E0] disabled:cursor-not-allowed text-white font-medium text-[14px] transition-colors cursor-pointer shadow-sm text-center"
+              className="flex-1 h-11 px-3 rounded-[16px] bg-[#7A1D2D] hover:bg-[#601724] active:scale-[0.98] disabled:bg-[#CBD5E0] disabled:cursor-not-allowed text-white font-medium text-[14px] transition-all cursor-pointer shadow-sm flex items-center justify-center whitespace-nowrap text-center"
             >
               {createCardMutation.isPending ? "Guardando..." : "Agregar tarjeta"}
             </button>

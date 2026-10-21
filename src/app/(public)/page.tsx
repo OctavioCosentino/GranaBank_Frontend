@@ -67,13 +67,13 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-6">
+    <main className="min-h-[100dvh] flex items-center justify-center p-6 py-12">
       <div className="w-full max-w-[360px] flex flex-col items-center">
-        {/* Banner institucional con mayor margen inferior */}
-        <GranaBanner className="mb-12" />
+        {/* Banner institucional con separación vertical ampliada */}
+        <GranaBanner className="mb-14 sm:mb-16" />
 
-        {/* Formulario de acceso con espaciado vertical distribuido */}
-        <form onSubmit={handleContinue} className="w-full flex flex-col gap-6">
+        {/* Formulario de acceso con espaciado vertical armónico */}
+        <form onSubmit={handleContinue} className="w-full flex flex-col">
           <Input
             title="Email"
             type="email"
@@ -88,7 +88,7 @@ export default function LoginPage() {
             autoComplete="email"
           />
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3.5 mt-7">
             <Input
               title="Contraseña"
               type="password"
@@ -105,7 +105,7 @@ export default function LoginPage() {
 
             {/* Indicador visual de credenciales incorrectas */}
             {hasCredentialsError && (
-              <div className="flex items-center gap-2 px-3.5 py-2 rounded-[12px] bg-[#FDF2F2] border border-[#FCA5A5]/60 animate-in fade-in slide-in-from-top-1 duration-200">
+              <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[12px] bg-[#FDF2F2] border border-[#FCA5A5]/60 animate-in fade-in slide-in-from-top-1 duration-200">
                 <svg
                   className="w-4 h-4 text-[#E53E3E] shrink-0"
                   viewBox="0 0 20 20"
@@ -128,7 +128,7 @@ export default function LoginPage() {
               checked={rememberMe}
               onChange={setRememberMe}
               label="Recordarme"
-              className="mt-1"
+              className="mt-1.5"
             />
           </div>
 
